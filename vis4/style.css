@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+svg {
+    font: 12px sans-serif;
+}
+
+.line {
+    fill: none;
+    stroke-width: 2px;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.grid line {
+    stroke: lightgray;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+.tooltip {
+    position: absolute;
+    background: #f9f9f9;
+    border: 1px solid #d3d3d3;
+    padding: 5px;
+    border-radius: 3px;
+    pointer-events: none;
+    font-size: 12px;
+    display: none;
+}

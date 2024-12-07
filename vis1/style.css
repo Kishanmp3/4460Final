@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+#chart {
+    margin: auto;
+    max-width: 900px;
+    height: 500px;
+}
+
+.line {
+    fill: none;
+    stroke-width: 2px;
+}
+
+.line.employment {
+    stroke: blue;
+}
+
+.line.unemployment {
+    stroke: red;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
