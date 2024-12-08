@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UK Unemployment Insights</title>
+    <style>
+      /* General Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+      }
+
+      /* Scrollable Snap Scrolling */
+      #page-container {
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        height: 100vh;
+      }
+
+      .section {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        scroll-snap-align: start;
+        padding: 20px;
+      }
+
+      /* Header Section */
+      .header {
+        background: #001f3f;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+      }
+
+      .sub-header {
+        font-size: 1.2rem;
+        font-style: italic;
+      }
+
+      /* Visualization Section */
+      .viz-container {
+        width: 80%;
+        height: 70%;
+        background: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+        padding: 10px;
+      }
+
+      .small-viz {
+        width: 60%;
+        height: 50%;
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 10px;
+      }
+
+      .section h2 {
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .section p {
+        font-size: 1.1rem;
+        color: #555;
+        max-width: 700px;
+        line-height: 1.5;
+      }
+
+      /* Alternating Background Colors */
+      .section:nth-child(odd) {
+        background: #f4f4f4;
+      }
+
+      .section:nth-child(even) {
+        background: #e0e0e0;
+      }
+
+      /* Footer Section */
+      .footer {
+        background: #001f3f;
+        color: white;
+      }
+
+      .footer h2 {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="page-container">
+      <!-- Intro Section -->
+      <section class="section header">
+        <div>
+          <h1>Understanding Unemployment in the UK</h1>
+          <p class="sub-header">Trends, Disparities, and Insights</p>
+          <p>
+            Unemployment is a critical measure of economic health and social
+            stability. This project explores key patterns in unemployment across
+            age groups, genders, regions, and time, while examining the role of
+            government expenditure and economic resilience.
+          </p>
+        </div>
+      </section>
+
+      <!-- Visualization 1: Unemployment by Age Group -->
+      <section class="section">
+        <h2>Unemployment Rate by Age Group</h2>
+        <p>
+          This visualization highlights how unemployment affects different age
+          groups in the UK. Younger age groups, especially 16-24, consistently
+          experience the highest rates of unemployment, reflecting challenges in
+          job entry and economic vulnerability during crises.
+        </p>
+        <div class="viz-container">
+          <iframe src="../vis4/index.html"></iframe>
+        </div>
+      </section>
+
+      <!-- Visualization 2: Gender Comparison -->
+      <section class="section">
+        <h2>Male vs Female Unemployment Rates</h2>
+        <p>
+          Gender dynamics add another layer of complexity to unemployment
+          trends. Historically, male unemployment has spiked during economic
+          crises, but the gap between genders has narrowed over time, reflecting
+          shifting workforce participation.
+        </p>
+        <div class="viz-container">
+          <iframe src="../vis2/index.html"></iframe>
+        </div>
+      </section>
+
+      <!-- Visualization 3: Government Expenditure -->
+      <section class="section">
+        <h2>Government Expenditure Breakdown</h2>
+        <p>
+          Government spending plays a pivotal role in addressing unemployment.
+          This visualization shows how expenditures across sectors, such as
+          health, education, and social security, shift during times of economic
+          stress.
+        </p>
+        <div class="viz-container">
+          <iframe src="../vis3/index.html"></iframe>
+        </div>
+      </section>
+
+      <!-- Visualization 4: Employment and Unemployment Trends -->
+      <section class="section">
+        <h2>Employment and Unemployment Rates Over Time</h2>
+        <p>
+          Employment and unemployment have an inverse relationship. This graph
+          highlights the peaks and troughs of both metrics, showcasing how
+          external shocks like the 2008 financial crisis and COVID-19 impacted
+          the UK job market.
+        </p>
+        <div class="viz-container">
+          <iframe
+            src="../vis1/index.html"
+            style="width: 100%; height: 100%; border: none; border-radius: 10px"
+          ></iframe>
+        </div>
+      </section>
+
+      <!-- Visualization 5: Regional Unemployment Rates -->
+      <section class="section">
+        <h2>Unemployment Rates Across UK Regions</h2>
+        <p>
+          Regional disparities in unemployment rates highlight the uneven
+          economic recovery across the UK. Certain regions, such as the North
+          and parts of Wales, consistently face higher unemployment, while the
+          Southeast and East fare better.
+        </p>
+        <div class="viz-container small-viz">
+          <iframe
+            src="../mapvisual/index.html"
+            style="width: 100%; height: 100%; border: none"
+          ></iframe>
+        </div>
+      </section>
+
+      <!-- Conclusion Section -->
+      <section class="section footer">
+        <div>
+          <h2>Conclusion</h2>
+          <p>
+            Addressing unemployment requires targeted policies to support
+            vulnerable age groups, bridge gender disparities, and address
+            regional inequalities. By understanding these trends, we pave the
+            way for a more inclusive economy and equitable recovery.
+          </p>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

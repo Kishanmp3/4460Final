@@ -4,26 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UK Regions Map</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
       body {
-        font-family: "Inter", sans-serif;
-        color: #333;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
       }
 
-      h2 {
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 2rem;
-        font-size: 1.8rem;
+      #map {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .map {
-        border: 1px solid #ccc;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
       }
 
       .region {
@@ -46,7 +46,7 @@
         border: 1px solid #ddd;
         border-radius: 6px;
         pointer-events: none;
-        font-family: "Inter", sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 13px;
         line-height: 1.4;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -57,15 +57,14 @@
         color: #1a1a1a;
       }
 
-      /* Style the legend text */
       .legend text {
-        font-family: "Inter", sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 11px;
         fill: #666;
       }
 
       .legend-title {
-        font-family: "Inter", sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 12px;
         font-weight: 500;
         fill: #333;
@@ -73,11 +72,9 @@
     </style>
   </head>
   <body>
-    <h2>Unemployment Rates Across UK Regions</h2>
     <div id="map"></div>
 
     <script>
-      // Unemployment data
       const unemploymentData = {
         "North East": 5.5,
         "North West": 4.2,
@@ -93,35 +90,31 @@
         Wales: 5.3,
       };
 
-      // Set dimensions
-      const width = 800;
-      const height = 600;
+      const container = document.getElementById("map");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
 
-      // Create color scale
       const colorScale = d3
         .scaleLinear()
         .domain([
           d3.min(Object.values(unemploymentData)),
           d3.max(Object.values(unemploymentData)),
         ])
-        .range(["#e6f3ff", "#0047ab"]); // Light blue to dark blue
+        .range(["#e6f3ff", "#0047ab"]);
 
-      // Create SVG
       const svg = d3
         .select("#map")
         .append("svg")
-        .attr("width", width)
-        .attr("height", height)
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("preserveAspectRatio", "xMidYMid meet")
         .attr("class", "map");
 
-      // Create tooltip div
       const tooltip = d3
         .select("body")
         .append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-      // Load and display data
       d3.json("uk_regions.geojson")
         .then(function (data) {
           const projection = d3
@@ -131,7 +124,6 @@
 
           const path = d3.geoPath().projection(projection);
 
-          // Draw regions
           svg
             .selectAll("path")
             .data(data.features)
@@ -170,7 +162,6 @@
               tooltip.transition().duration(500).style("opacity", 0);
             });
 
-          // Add a legend
           const legendWidth = 200;
           const legendHeight = 10;
 
@@ -191,7 +182,6 @@
             .append("g")
             .attr("transform", `translate(50, ${height - 50})`);
 
-          // Create gradient for legend
           const defs = svg.append("defs");
           const gradient = defs
             .append("linearGradient")
@@ -209,20 +199,17 @@
             .attr("offset", "100%")
             .attr("stop-color", "#0047ab");
 
-          // Add the legend rectangle
           legend
             .append("rect")
             .attr("width", legendWidth)
             .attr("height", legendHeight)
             .style("fill", "url(#legend-gradient)");
 
-          // Add the legend axis
           legend
             .append("g")
             .attr("transform", `translate(0, ${legendHeight})`)
             .call(legendAxis);
 
-          // Add legend title
           legend
             .append("text")
             .attr("y", -5)
