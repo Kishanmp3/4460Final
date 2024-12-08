@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UK Regions Map</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        color: #333;
+      }
+
+      h2 {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+        font-size: 1.8rem;
+      }
+
+      .map {
+        border: 1px solid #ccc;
+      }
+
+      .region {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: 0.5;
+        transition: all 0.2s;
+      }
+
+      .region:hover {
+        stroke: #333;
+        stroke-width: 2;
+        filter: brightness(0.9);
+      }
+
+      .tooltip {
+        position: absolute;
+        background: white;
+        padding: 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        pointer-events: none;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        line-height: 1.4;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .tooltip strong {
+        font-weight: 500;
+        color: #1a1a1a;
+      }
+
+      /* Style the legend text */
+      .legend text {
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        fill: #666;
+      }
+
+      .legend-title {
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        fill: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Unemployment Rates Across UK Regions</h2>
+    <div id="map"></div>
+
+    <script>
+      // Unemployment data
+      const unemploymentData = {
+        "North East": 5.5,
+        "North West": 4.2,
+        "Yorkshire and the Humber": 3.4,
+        "East Midlands": 4.6,
+        "West Midlands": 4.5,
+        East: 3.4,
+        London: 5.9,
+        "South East": 4.0,
+        "South West": 3.6,
+        "Northern Ireland": 2.0,
+        Scotland: 3.3,
+        Wales: 5.3,
+      };
+
+      // Set dimensions
+      const width = 800;
+      const height = 600;
+
+      // Create color scale
+      const colorScale = d3
+        .scaleLinear()
+        .domain([
+          d3.min(Object.values(unemploymentData)),
+          d3.max(Object.values(unemploymentData)),
+        ])
+        .range(["#e6f3ff", "#0047ab"]); // Light blue to dark blue
+
+      // Create SVG
+      const svg = d3
+        .select("#map")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("class", "map");
+
+      // Create tooltip div
+      const tooltip = d3
+        .select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+      // Load and display data
+      d3.json("uk_regions.geojson")
+        .then(function (data) {
+          const projection = d3
+            .geoIdentity()
+            .reflectY(true)
+            .fitSize([width, height], data);
+
+          const path = d3.geoPath().projection(projection);
+
+          // Draw regions
+          svg
+            .selectAll("path")
+            .data(data.features)
+            .enter()
+            .append("path")
+            .attr("class", "region")
+            .attr("d", path)
+            .style("fill", (d) =>
+              colorScale(unemploymentData[d.properties.rgn19nm])
+            )
+            .on("mouseover", function (event, d) {
+              const region = d.properties.rgn19nm;
+              const unemployment = unemploymentData[region];
+
+              d3.select(this)
+                .style("cursor", "pointer")
+                .style("filter", "brightness(0.9)");
+
+              tooltip.transition().duration(200).style("opacity", 0.9);
+
+              tooltip
+                .html(
+                  `<strong>${region}</strong><br/>` +
+                    `Unemployment Rate: ${unemployment}%`
+                )
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY - 28 + "px");
+            })
+            .on("mousemove", function (event) {
+              tooltip
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY - 28 + "px");
+            })
+            .on("mouseout", function (d) {
+              d3.select(this).style("filter", "none");
+              tooltip.transition().duration(500).style("opacity", 0);
+            });
+
+          // Add a legend
+          const legendWidth = 200;
+          const legendHeight = 10;
+
+          const legendScale = d3
+            .scaleLinear()
+            .domain([
+              d3.min(Object.values(unemploymentData)),
+              d3.max(Object.values(unemploymentData)),
+            ])
+            .range([0, legendWidth]);
+
+          const legendAxis = d3
+            .axisBottom(legendScale)
+            .ticks(5)
+            .tickFormat((d) => d + "%");
+
+          const legend = svg
+            .append("g")
+            .attr("transform", `translate(50, ${height - 50})`);
+
+          // Create gradient for legend
+          const defs = svg.append("defs");
+          const gradient = defs
+            .append("linearGradient")
+            .attr("id", "legend-gradient")
+            .attr("x1", "0%")
+            .attr("x2", "100%");
+
+          gradient
+            .append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", "#e6f3ff");
+
+          gradient
+            .append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "#0047ab");
+
+          // Add the legend rectangle
+          legend
+            .append("rect")
+            .attr("width", legendWidth)
+            .attr("height", legendHeight)
+            .style("fill", "url(#legend-gradient)");
+
+          // Add the legend axis
+          legend
+            .append("g")
+            .attr("transform", `translate(0, ${legendHeight})`)
+            .call(legendAxis);
+
+          // Add legend title
+          legend
+            .append("text")
+            .attr("y", -5)
+            .style("font-size", "12px")
+            .text("Unemployment Rate");
+        })
+        .catch(function (error) {
+          console.error("Error loading the data:", error);
+        });
+    </script>
+  </body>
+</html>
