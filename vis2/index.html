@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sankey Diagram</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-</head>
-<body>
-  <div id="slider-container">
-    <label for="year-slider">Select Year:</label>
-    <input type="range" id="year-slider" min="1979" max="2022" value="1979" step="1">
-    <span id="year-display">1979-80</span>
-  </div>
-  <div id="chart-container">
-    <svg id="sankey-chart" width="1000" height="600"></svg>
-  </div>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-  <script src="sankey.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sankey Diagram</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div id="slider-container">
+      <label for="year-slider">Select Year:</label>
+      <input
+        type="range"
+        id="year-slider"
+        min="1979"
+        max="2022"
+        value="1979"
+        step="1"
+      />
+      <span id="year-display">1979-80</span>
+    </div>
+    <div id="chart-container">
+      <svg id="sankey-chart" width="1000" height="600"></svg>
+    </div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+    <script src="script.js "></script>
+  </body>
 </html>

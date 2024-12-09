@@ -3,17 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UK Regions Map</title>
+    <title>UK Regions Map with Graph</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
       body {
         margin: 0;
         padding: 0;
-        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        font-family: Arial, sans-serif;
       }
 
       #map {
-        width: 100%;
+        width: 60%;
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -24,6 +27,23 @@
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+      }
+
+      #graph {
+        width: 35%;
+        height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #graph-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
       }
 
       .region {
@@ -57,22 +77,28 @@
         color: #1a1a1a;
       }
 
-      .legend text {
-        font-family: Arial, sans-serif;
-        font-size: 11px;
-        fill: #666;
+      .label {
+        fill: black;
+        font-size: 12px;
+        text-anchor: middle;
+        opacity: 0;
+        pointer-events: none;
       }
 
-      .legend-title {
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 500;
-        fill: #333;
+      .zero-line {
+        stroke: black;
+        stroke-width: 1;
+        stroke-dasharray: 4;
       }
     </style>
   </head>
   <body>
     <div id="map"></div>
+    <div id="graph">
+      <div id="graph-title">
+        Difference in Regional Unemployment Rates from National Average
+      </div>
+    </div>
 
     <script>
       const unemploymentData = {
@@ -89,6 +115,8 @@
         Scotland: 3.3,
         Wales: 5.3,
       };
+
+      const nationalAverage = 4.3;
 
       const container = document.getElementById("map");
       const width = container.clientWidth;
@@ -113,6 +141,95 @@
         .select("body")
         .append("div")
         .attr("class", "tooltip")
+        .style("opacity", 0);
+
+      // Add graph container
+      const graphWidth = document.getElementById("graph").clientWidth;
+      const graphHeight = document.getElementById("graph").clientHeight;
+
+      const graphSvg = d3
+        .select("#graph")
+        .append("svg")
+        .attr("width", graphWidth)
+        .attr("height", graphHeight);
+
+      // Graph margins
+      const margins = { top: 20, right: 30, bottom: 40, left: 50 };
+      const graphInnerWidth = graphWidth - margins.left - margins.right;
+      const graphInnerHeight = graphHeight - margins.top - margins.bottom;
+
+      const graphGroup = graphSvg
+        .append("g")
+        .attr("transform", `translate(${margins.left}, ${margins.top})`);
+
+      const xScale = d3
+        .scaleBand()
+        .domain(Object.keys(unemploymentData))
+        .range([0, graphInnerWidth])
+        .padding(0.2);
+
+      const yScale = d3
+        .scaleLinear()
+        .domain([
+          d3.min(Object.values(unemploymentData), (d) => d - nationalAverage),
+          d3.max(Object.values(unemploymentData), (d) => d - nationalAverage),
+        ])
+        .range([graphInnerHeight, 0]);
+
+      // Add axes
+      graphGroup
+        .append("g")
+        .attr("transform", `translate(0, ${graphInnerHeight})`)
+        .call(
+          d3
+            .axisBottom(xScale)
+            .tickSize(0)
+            .tickFormat(() => "")
+        );
+
+      graphGroup.append("g").call(d3.axisLeft(yScale));
+
+      // Add zero line
+      graphGroup
+        .append("line")
+        .attr("x1", 0)
+        .attr("x2", graphInnerWidth)
+        .attr("y1", yScale(0))
+        .attr("y2", yScale(0))
+        .attr("class", "zero-line");
+
+      // Add bars
+      const bars = graphGroup
+        .selectAll("rect")
+        .data(Object.entries(unemploymentData))
+        .enter()
+        .append("rect")
+        .attr("x", ([region]) => xScale(region))
+        .attr("y", ([, rate]) =>
+          rate - nationalAverage > 0
+            ? yScale(rate - nationalAverage)
+            : yScale(0)
+        )
+        .attr("width", xScale.bandwidth())
+        .attr("height", ([, rate]) =>
+          Math.abs(yScale(rate - nationalAverage) - yScale(0))
+        )
+        .attr("fill", ([region]) => colorScale(unemploymentData[region]));
+
+      // Add labels (hidden by default)
+      const labels = graphGroup
+        .selectAll("text.label")
+        .data(Object.entries(unemploymentData))
+        .enter()
+        .append("text")
+        .attr("x", ([region]) => xScale(region) + xScale.bandwidth() / 2)
+        .attr("y", ([, rate]) =>
+          rate - nationalAverage > 0
+            ? yScale(rate - nationalAverage) - 5
+            : yScale(rate - nationalAverage) + 15
+        )
+        .text(([region]) => region)
+        .attr("class", "label")
         .style("opacity", 0);
 
       d3.json("uk_regions.geojson")
@@ -147,19 +264,29 @@
               tooltip
                 .html(
                   `<strong>${region}</strong><br/>` +
-                    `Unemployment Rate: ${unemployment}%`
+                    `Unemployment Rate: ${unemployment}%` +
+                    `<br> Difference: ${(
+                      unemployment - nationalAverage
+                    ).toFixed(2)}%`
                 )
                 .style("left", event.pageX + 10 + "px")
                 .style("top", event.pageY - 28 + "px");
+
+              // Highlight bar and show label
+              bars.filter(([key]) => key === region).attr("fill", "orange");
+
+              labels.filter(([key]) => key === region).style("opacity", 1);
             })
-            .on("mousemove", function (event) {
-              tooltip
-                .style("left", event.pageX + 10 + "px")
-                .style("top", event.pageY - 28 + "px");
-            })
-            .on("mouseout", function (d) {
+            .on("mouseout", function (event, d) {
               d3.select(this).style("filter", "none");
               tooltip.transition().duration(500).style("opacity", 0);
+
+              // Reset bar color and hide label
+              bars.attr("fill", ([region]) =>
+                colorScale(unemploymentData[region])
+              );
+
+              labels.style("opacity", 0);
             });
 
           const legendWidth = 200;
